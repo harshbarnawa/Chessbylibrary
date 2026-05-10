@@ -28,6 +28,15 @@ const ChessGame = () => {
   const [players, setPlayers] =
     useState([])
 
+  const [whiteTime, setWhiteTime] =
+    useState(600)
+
+  const [blackTime, setBlackTime] =
+    useState(600)
+
+  const [winner, setWinner] =
+    useState(null)
+
   const { roomId } = useParams()
 
   useEffect(() => {
@@ -83,6 +92,50 @@ const ChessGame = () => {
     }
   }, [])
 
+  useEffect(() => {
+    if (winner) return
+
+    const interval = setInterval(() => {
+      if (game.turn() === 'w') {
+        setWhiteTime((prev) => {
+          if (prev <= 1) {
+            setWinner('Black')
+            clearInterval(interval)
+            return 0
+          }
+
+          return prev - 1
+        })
+      } else {
+        setBlackTime((prev) => {
+          if (prev <= 1) {
+            setWinner('White')
+            clearInterval(interval)
+            return 0
+          }
+
+          return prev - 1
+        })
+      }
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [game, winner])
+
+  const formatTime = (time) => {
+    const minutes = Math.floor(
+      time / 60
+    )
+
+    const seconds = time % 60
+
+    return `${minutes}:${
+      seconds < 10
+        ? '0'
+        : ''
+    }${seconds}`
+  }
+
   const getValidMoves = (square) => {
     return game
       .moves({
@@ -106,6 +159,8 @@ const ChessGame = () => {
   }
 
   const movePiece = (from, to) => {
+    if (winner) return
+
     const gameCopy = new Chess(
       game.fen()
     )
@@ -139,6 +194,8 @@ const ChessGame = () => {
   }
 
   const onSquareClick = (square) => {
+    if (winner) return
+
     const piece = game.get(square)
 
     if (!selectedSquare) {
@@ -184,6 +241,12 @@ const ChessGame = () => {
     setSelectedSquare(null)
 
     setMoveHistory([])
+
+    setWhiteTime(600)
+
+    setBlackTime(600)
+
+    setWinner(null)
   }
 
   const pieceSymbols = {
@@ -209,7 +272,7 @@ const ChessGame = () => {
   const renderBoard = () => {
     const board = []
 
-    const ranks = [
+    const normalRanks = [
       '8',
       '7',
       '6',
@@ -220,7 +283,7 @@ const ChessGame = () => {
       '1',
     ]
 
-    const files = [
+    const normalFiles = [
       'a',
       'b',
       'c',
@@ -230,6 +293,38 @@ const ChessGame = () => {
       'g',
       'h',
     ]
+
+    const flippedRanks = [
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+    ]
+
+    const flippedFiles = [
+      'h',
+      'g',
+      'f',
+      'e',
+      'd',
+      'c',
+      'b',
+      'a',
+    ]
+
+    const ranks =
+      playerColor === 'black'
+        ? flippedRanks
+        : normalRanks
+
+    const files =
+      playerColor === 'black'
+        ? flippedFiles
+        : normalFiles
 
     ranks.forEach((rank, rIdx) => {
       files.forEach(
@@ -315,6 +410,10 @@ const ChessGame = () => {
   }
 
   const getStatus = () => {
+    if (winner) {
+      return `${winner} wins on time!`
+    }
+
     if (game.isCheckmate()) {
       return game.turn() === 'w'
         ? 'Checkmate! Black Wins!'
@@ -374,6 +473,7 @@ const ChessGame = () => {
               style={{
                 marginBottom: '15px',
                 fontWeight: 'bold',
+                fontSize: '18px',
               }}
             >
               You are playing as:{' '}
@@ -393,6 +493,48 @@ const ChessGame = () => {
                 Waiting for opponent...
               </div>
             )}
+
+          <div
+            style={{
+              display: 'flex',
+              justifyContent:
+                'space-between',
+              marginBottom: '15px',
+              fontWeight: 'bold',
+              fontSize: '20px',
+            }}
+          >
+            <div>
+              White ⏱{' '}
+              {formatTime(
+                whiteTime
+              )}
+            </div>
+
+            <div>
+              Black ⏱{' '}
+              {formatTime(
+                blackTime
+              )}
+            </div>
+          </div>
+
+          {winner && (
+            <div
+              style={{
+                marginBottom: '15px',
+                background: '#ff4d4d',
+                color: 'white',
+                padding: '12px',
+                borderRadius: '10px',
+                fontWeight: 'bold',
+                textAlign: 'center',
+                fontSize: '20px',
+              }}
+            >
+              {winner} wins on time!
+            </div>
+          )}
 
           <div className="board">
             {renderBoard()}

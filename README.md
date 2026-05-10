@@ -1,16 +1,46 @@
-# React + Vite
+# ♟ Chess Arena
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern real-time multiplayer chess game built with React, Socket.io, and chess.js.
 
-Currently, two official plugins are available:
+Create private rooms, share invite links, and play live chess with friends in real-time.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Real-time multiplayer
+- Private room system
+- Automatic white/black assignment
+- Auto-flipped board for black player
+- 10-minute chess timers
+- Check & checkmate detection
+- Move history
+- Modern responsive UI
+- Legal move validation using chess.js
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🛠 Tech Stack
+
+**Frontend:** React, React Router, chess.js  
+**Backend:** Node.js, Express, Socket.io
+
+---
+
+## 🚀 Run Locally
+
+```bash
+npm install
+npm run dev
+```
+
+Backend:
+
+```bash
+cd server
+node index.js
+```
+
+---
+
+Built with ❤️ using React + Socket.io
