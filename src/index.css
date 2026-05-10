@@ -1,0 +1,164 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #dfe6dc;
+  color: #111;
+}
+.chess-app {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+}
+
+.chess-container {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.board-wrapper {
+  background: #f5f5f5;
+  padding: 20px;
+  border-radius: 24px;
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.game-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1b1b1b;
+}
+
+.new-game-btn {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 12px;
+  background: #8bb174;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.new-game-btn:hover {
+  transform: scale(1.05);
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(8, 82px);
+  border-radius: 14px;
+  overflow: hidden;
+  border: 8px solid #d6d6d6;
+}
+
+.square {
+  width: 82px;
+  height: 82px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.light {
+  background: #edf2e3;
+}
+
+.dark {
+  background: #8bb174;
+}
+
+.selected {
+  background: #f6f669 !important;
+}
+
+.valid::after {
+  content: '';
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.28);
+  position: absolute;
+}
+
+.check {
+  background: #ff4d4d !important;
+}
+
+.piece {
+  font-size: 58px;
+  user-select: none;
+  transition: 0.15s;
+}
+
+.square:hover .piece {
+  transform: scale(1.08);
+}
+
+.white-piece {
+  color: white;
+  text-shadow:
+    0 0 2px #000,
+    0 2px 5px rgba(0,0,0,0.45);
+}
+
+.black-piece {
+  color: #111;
+  text-shadow:
+    0 1px 2px rgba(255,255,255,0.2);
+}
+
+.sidebar {
+  width: 320px;
+  background: #f5f5f5;
+  border-radius: 24px;
+  padding: 22px;
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+}
+
+.status-box {
+  background: #edf2e3;
+  padding: 16px;
+  border-radius: 14px;
+  margin-top: 12px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.moves-box {
+  margin-top: 22px;
+  background: #edf2e3;
+  border-radius: 14px;
+  padding: 15px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.move {
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
