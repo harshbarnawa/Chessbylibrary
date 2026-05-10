@@ -37,6 +37,9 @@ const ChessGame = () => {
   const [winner, setWinner] =
     useState(null)
 
+  const [gameStarted, setGameStarted] =
+    useState(false)
+
   const { roomId } = useParams()
 
   useEffect(() => {
@@ -84,6 +87,8 @@ const ChessGame = () => {
 
           return gameCopy
         })
+
+        setGameStarted(true)
       }
     )
 
@@ -93,7 +98,12 @@ const ChessGame = () => {
   }, [])
 
   useEffect(() => {
-    if (winner) return
+    if (
+      winner ||
+      !gameStarted ||
+      players.length < 2
+    )
+      return
 
     const interval = setInterval(() => {
       if (game.turn() === 'w') {
@@ -120,7 +130,12 @@ const ChessGame = () => {
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [game, winner])
+  }, [
+    game,
+    winner,
+    gameStarted,
+    players,
+  ])
 
   const formatTime = (time) => {
     const minutes = Math.floor(
@@ -177,6 +192,8 @@ const ChessGame = () => {
       setMoveHistory(
         gameCopy.history()
       )
+
+      setGameStarted(true)
 
       if (roomId) {
         socket.emit('move', {
@@ -247,6 +264,8 @@ const ChessGame = () => {
     setBlackTime(600)
 
     setWinner(null)
+
+    setGameStarted(false)
   }
 
   const pieceSymbols = {
@@ -414,6 +433,10 @@ const ChessGame = () => {
       return `${winner} wins on time!`
     }
 
+    if (players.length < 2) {
+      return 'Waiting for opponent...'
+    }
+
     if (game.isCheckmate()) {
       return game.turn() === 'w'
         ? 'Checkmate! Black Wins!'
@@ -480,19 +503,6 @@ const ChessGame = () => {
               {playerColor || '...'}
             </div>
           )}
-
-          {roomId &&
-            players.length < 2 && (
-              <div
-                style={{
-                  marginBottom: '15px',
-                  color: 'red',
-                  fontWeight: 'bold',
-                }}
-              >
-                Waiting for opponent...
-              </div>
-            )}
 
           <div
             style={{
