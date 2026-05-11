@@ -28,18 +28,6 @@ const ChessGame = () => {
   const [players, setPlayers] =
     useState([])
 
-  const [whiteTime, setWhiteTime] =
-    useState(600)
-
-  const [blackTime, setBlackTime] =
-    useState(600)
-
-  const [winner, setWinner] =
-    useState(null)
-
-  const [gameStarted, setGameStarted] =
-    useState(false)
-
   const [opponentOffline, setOpponentOffline] =
     useState(false)
 
@@ -51,10 +39,7 @@ const ChessGame = () => {
 
   const { roomId } = useParams()
 
-  const isMultiplayer =
-    window.location.pathname.includes(
-      '/room/'
-    )
+  const isMultiplayer = !!roomId
 
   useEffect(() => {
     if (!isMultiplayer) return
@@ -81,10 +66,10 @@ const ChessGame = () => {
     socket.on(
       'receiveMove',
       (move) => {
-        setGame((currentGame) => {
+        setGame((prevGame) => {
           const gameCopy =
             new Chess(
-              currentGame.fen()
+              prevGame.fen()
             )
 
           gameCopy.move(move)
@@ -95,8 +80,6 @@ const ChessGame = () => {
 
           return gameCopy
         })
-
-        setGameStarted(true)
       }
     )
 
@@ -118,7 +101,7 @@ const ChessGame = () => {
         'opponentDisconnected'
       )
     }
-  }, [roomId, isMultiplayer])
+  }, [roomId])
 
   useEffect(() => {
     if (
@@ -148,70 +131,6 @@ const ChessGame = () => {
     gameAborted,
   ])
 
-  useEffect(() => {
-    if (
-      winner ||
-      !gameStarted
-    )
-      return
-
-    if (
-      isMultiplayer &&
-      players.length < 2
-    )
-      return
-
-    const interval = setInterval(() => {
-      if (game.turn() === 'w') {
-        setWhiteTime((prev) => {
-          if (prev <= 1) {
-            setWinner('Black')
-
-            clearInterval(interval)
-
-            return 0
-          }
-
-          return prev - 1
-        })
-      } else {
-        setBlackTime((prev) => {
-          if (prev <= 1) {
-            setWinner('White')
-
-            clearInterval(interval)
-
-            return 0
-          }
-
-          return prev - 1
-        })
-      }
-    }, 1000)
-
-    return () => clearInterval(interval)
-  }, [
-    game,
-    winner,
-    gameStarted,
-    players,
-    isMultiplayer,
-  ])
-
-  const formatTime = (time) => {
-    const minutes = Math.floor(
-      time / 60
-    )
-
-    const seconds = time % 60
-
-    return `${minutes}:${
-      seconds < 10
-        ? '0'
-        : ''
-    }${seconds}`
-  }
-
   const getValidMoves = (square) => {
     return game
       .moves({
@@ -225,20 +144,20 @@ const ChessGame = () => {
     if (!isMultiplayer)
       return true
 
+    if (!piece) return false
+
     return (
       (playerColor === 'white' &&
-        piece.color === 'w') ||
+        piece.color === 'w' &&
+        game.turn() === 'w') ||
       (playerColor === 'black' &&
-        piece.color === 'b')
+        piece.color === 'b' &&
+        game.turn() === 'b')
     )
   }
 
   const movePiece = (from, to) => {
-    if (
-      winner ||
-      gameAborted
-    )
-      return
+    if (gameAborted) return
 
     const gameCopy = new Chess(
       game.fen()
@@ -257,8 +176,6 @@ const ChessGame = () => {
         gameCopy.history()
       )
 
-      setGameStarted(true)
-
       if (isMultiplayer) {
         socket.emit('move', {
           roomId,
@@ -275,18 +192,13 @@ const ChessGame = () => {
   }
 
   const onSquareClick = (square) => {
-    if (
-      winner ||
-      gameAborted
-    )
-      return
+    if (gameAborted) return
 
     const piece = game.get(square)
 
     if (!selectedSquare) {
       if (
         piece &&
-        piece.color === game.turn() &&
         canMovePiece(piece)
       ) {
         setSelectedSquare(square)
@@ -309,7 +221,6 @@ const ChessGame = () => {
 
     if (
       piece &&
-      piece.color === game.turn() &&
       canMovePiece(piece)
     ) {
       setSelectedSquare(square)
@@ -318,28 +229,6 @@ const ChessGame = () => {
     }
 
     setSelectedSquare(null)
-  }
-
-  const resetGame = () => {
-    setGame(new Chess())
-
-    setSelectedSquare(null)
-
-    setMoveHistory([])
-
-    setWhiteTime(600)
-
-    setBlackTime(600)
-
-    setWinner(null)
-
-    setGameStarted(false)
-
-    setOpponentOffline(false)
-
-    setAbortTimer(60)
-
-    setGameAborted(false)
   }
 
   const pieceSymbols = {
@@ -447,23 +336,23 @@ const ChessGame = () => {
                 onSquareClick(square)
               }
               className={`
-              square
-              ${
-                isDark
-                  ? 'dark'
-                  : 'light'
-              }
-              ${
-                isSelected
-                  ? 'selected'
-                  : ''
-              }
-              ${
-                isValidMove
-                  ? 'valid'
-                  : ''
-              }
-            `}
+                square
+                ${
+                  isDark
+                    ? 'dark'
+                    : 'light'
+                }
+                ${
+                  isSelected
+                    ? 'selected'
+                    : ''
+                }
+                ${
+                  isValidMove
+                    ? 'valid'
+                    : ''
+                }
+              `}
             >
               {piece && (
                 <span
@@ -498,13 +387,6 @@ const ChessGame = () => {
             <h1 className="game-title">
               ♟ Chess Arena
             </h1>
-
-            <button
-              className="new-game-btn"
-              onClick={resetGame}
-            >
-              New Game
-            </button>
           </div>
 
           {!isMultiplayer && (
@@ -585,69 +467,8 @@ const ChessGame = () => {
             </div>
           )}
 
-          <div
-            style={{
-              display: 'flex',
-              justifyContent:
-                'space-between',
-              marginBottom: '15px',
-              fontWeight: 'bold',
-              fontSize: '20px',
-            }}
-          >
-            <div>
-              White ⏱{' '}
-              {formatTime(
-                whiteTime
-              )}
-            </div>
-
-            <div>
-              Black ⏱{' '}
-              {formatTime(
-                blackTime
-              )}
-            </div>
-          </div>
-
           <div className="board">
             {renderBoard()}
-          </div>
-        </div>
-
-        <div className="sidebar">
-          <h2>Game Status</h2>
-
-          <div className="status-box">
-            {gameAborted
-              ? 'Game Aborted'
-              : opponentOffline
-              ? 'Opponent Offline'
-              : game.turn() ===
-                'w'
-              ? "White's Turn"
-              : "Black's Turn"}
-          </div>
-
-          <div className="moves-box">
-            <h3>Move History</h3>
-
-            {moveHistory.length ===
-            0 ? (
-              <p>No moves yet</p>
-            ) : (
-              moveHistory.map(
-                (move, index) => (
-                  <div
-                    key={index}
-                    className="move"
-                  >
-                    {index + 1}.{' '}
-                    {move}
-                  </div>
-                )
-              )
-            )}
           </div>
         </div>
       </div>
