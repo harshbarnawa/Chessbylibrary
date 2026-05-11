@@ -40,6 +40,18 @@ const ChessGame = () => {
   const [gameStarted, setGameStarted] =
     useState(false)
 
+  const [opponentOffline, setOpponentOffline] =
+    useState(false)
+
+  const [abortTimer, setAbortTimer] =
+    useState(60)
+
+  const [gameAborted, setGameAborted] =
+    useState(false)
+
+  const [copied, setCopied] =
+    useState(false)
+
   const { roomId } = useParams()
 
   useEffect(() => {
@@ -55,17 +67,36 @@ const ChessGame = () => {
 
       socket.on('players', (data) => {
         setPlayers(data)
+
+        if (data.length === 2) {
+          setOpponentOffline(false)
+
+          setAbortTimer(60)
+        }
       })
 
       socket.on('roomFull', () => {
         alert('Room is full')
       })
+
+      socket.on(
+        'opponentDisconnected',
+        () => {
+          setOpponentOffline(true)
+        }
+      )
     }
 
     return () => {
       socket.off('playerColor')
+
       socket.off('players')
+
       socket.off('roomFull')
+
+      socket.off(
+        'opponentDisconnected'
+      )
     }
   }, [roomId])
 
@@ -99,9 +130,42 @@ const ChessGame = () => {
 
   useEffect(() => {
     if (
+      !roomId ||
+      players.length >= 2 ||
+      gameAborted
+    )
+      return
+
+    const interval = setInterval(() => {
+      setAbortTimer((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval)
+
+          setGameAborted(true)
+
+          return 0
+        }
+
+        return prev - 1
+      })
+    }, 1000)
+
+    return () =>
+      clearInterval(interval)
+  }, [
+    roomId,
+    players,
+    gameAborted,
+  ])
+
+  useEffect(() => {
+    if (
       winner ||
       !gameStarted ||
-      players.length < 2
+      (
+        roomId &&
+        players.length < 2
+      )
     )
       return
 
@@ -110,7 +174,9 @@ const ChessGame = () => {
         setWhiteTime((prev) => {
           if (prev <= 1) {
             setWinner('Black')
+
             clearInterval(interval)
+
             return 0
           }
 
@@ -120,7 +186,9 @@ const ChessGame = () => {
         setBlackTime((prev) => {
           if (prev <= 1) {
             setWinner('White')
+
             clearInterval(interval)
+
             return 0
           }
 
@@ -135,6 +203,7 @@ const ChessGame = () => {
     winner,
     gameStarted,
     players,
+    roomId,
   ])
 
   const formatTime = (time) => {
@@ -174,7 +243,11 @@ const ChessGame = () => {
   }
 
   const movePiece = (from, to) => {
-    if (winner) return
+    if (
+      winner ||
+      gameAborted
+    )
+      return
 
     const gameCopy = new Chess(
       game.fen()
@@ -211,7 +284,11 @@ const ChessGame = () => {
   }
 
   const onSquareClick = (square) => {
-    if (winner) return
+    if (
+      winner ||
+      gameAborted
+    )
+      return
 
     const piece = game.get(square)
 
@@ -266,6 +343,12 @@ const ChessGame = () => {
     setWinner(null)
 
     setGameStarted(false)
+
+    setOpponentOffline(false)
+
+    setAbortTimer(60)
+
+    setGameAborted(false)
   }
 
   const pieceSymbols = {
@@ -429,11 +512,22 @@ const ChessGame = () => {
   }
 
   const getStatus = () => {
+    if (gameAborted) {
+      return 'Game Aborted'
+    }
+
+    if (opponentOffline) {
+      return 'Opponent Offline'
+    }
+
     if (winner) {
       return `${winner} wins on time!`
     }
 
-    if (players.length < 2) {
+    if (
+      roomId &&
+      players.length < 2
+    ) {
       return 'Waiting for opponent...'
     }
 
@@ -474,7 +568,7 @@ const ChessGame = () => {
             </button>
           </div>
 
-          {!roomId && (
+          {!roomId ? (
             <button
               className="new-game-btn"
               style={{
@@ -489,6 +583,91 @@ const ChessGame = () => {
             >
               Create Multiplayer Room
             </button>
+          ) : (
+            <div
+              style={{
+                marginBottom: '15px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '10px',
+                  flexWrap: 'wrap',
+                }}
+              >
+                <input
+                  value={
+                    window.location.href
+                  }
+                  readOnly
+                  style={{
+                    padding: '10px',
+                    borderRadius:
+                      '10px',
+                    border:
+                      '1px solid #ccc',
+                    flex: 1,
+                    minWidth: '220px',
+                  }}
+                />
+
+                <button
+                  className="new-game-btn"
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      window.location
+                        .href
+                    )
+
+                    setCopied(true)
+
+                    setTimeout(() => {
+                      setCopied(false)
+                    }, 2000)
+                  }}
+                >
+                  {copied
+                    ? 'Copied!'
+                    : 'Share Link'}
+                </button>
+              </div>
+
+              {players.length < 2 &&
+                !gameAborted && (
+                  <div
+                    style={{
+                      background:
+                        '#ffcc00',
+                      padding: '12px',
+                      borderRadius:
+                        '10px',
+                      fontWeight:
+                        'bold',
+                      display: 'flex',
+                      justifyContent:
+                        'space-between',
+                      alignItems:
+                        'center',
+                      gap: '10px',
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <span>
+                      Waiting for
+                      opponent...
+                    </span>
+
+                    <span>
+                      Auto Abort in:{' '}
+                      {abortTimer}s
+                    </span>
+                  </div>
+                )}
+            </div>
           )}
 
           {roomId && (
@@ -529,20 +708,62 @@ const ChessGame = () => {
             </div>
           </div>
 
+          {opponentOffline &&
+            !gameAborted && (
+              <div
+                style={{
+                  marginBottom: '15px',
+                  background:
+                    '#ff4d4d',
+                  color: 'white',
+                  padding: '12px',
+                  borderRadius:
+                    '10px',
+                  fontWeight:
+                    'bold',
+                  textAlign: 'center',
+                }}
+              >
+                Opponent Offline
+              </div>
+            )}
+
+          {gameAborted && (
+            <div
+              style={{
+                marginBottom: '15px',
+                background: '#111',
+                color: 'white',
+                padding: '12px',
+                borderRadius:
+                  '10px',
+                fontWeight:
+                  'bold',
+                textAlign: 'center',
+              }}
+            >
+              Game Aborted
+            </div>
+          )}
+
           {winner && (
             <div
               style={{
                 marginBottom: '15px',
-                background: '#ff4d4d',
+                background:
+                  '#ff4d4d',
                 color: 'white',
                 padding: '12px',
-                borderRadius: '10px',
-                fontWeight: 'bold',
+                borderRadius:
+                  '10px',
+                fontWeight:
+                  'bold',
                 textAlign: 'center',
                 fontSize: '20px',
               }}
             >
-              {winner} wins on time!
+              {winner} wins on
+              time!
             </div>
           )}
 
