@@ -1,6 +1,9 @@
 const express = require('express')
+
 const http = require('http')
+
 const { Server } = require('socket.io')
+
 const cors = require('cors')
 
 const app = express()
@@ -13,15 +16,23 @@ const io = new Server(server, {
   cors: {
     origin: '*',
   },
+
+  pingTimeout: 5000,
+  pingInterval: 2000,
 })
 
 const rooms = {}
 
 io.on('connection', (socket) => {
-  console.log('User connected:', socket.id)
+  console.log(
+    'User connected:',
+    socket.id
+  )
 
   socket.on('joinRoom', (roomId) => {
     socket.join(roomId)
+
+    socket.roomId = roomId
 
     if (!rooms[roomId]) {
       rooms[roomId] = []
@@ -29,6 +40,7 @@ io.on('connection', (socket) => {
 
     if (rooms[roomId].length >= 2) {
       socket.emit('roomFull')
+
       return
     }
 
@@ -42,7 +54,10 @@ io.on('connection', (socket) => {
       color,
     })
 
-    socket.emit('playerColor', color)
+    socket.emit(
+      'playerColor',
+      color
+    )
 
     io.to(roomId).emit(
       'players',
@@ -50,32 +65,56 @@ io.on('connection', (socket) => {
     )
 
     console.log(
-      `${socket.id} joined room ${roomId} as ${color}`
+      `${socket.id} joined ${roomId}`
     )
   })
 
-  socket.on('move', ({ roomId, move }) => {
-    socket.to(roomId).emit(
-      'receiveMove',
-      move
-    )
-  })
+  socket.on(
+    'move',
+    ({ roomId, move }) => {
+      socket.to(roomId).emit(
+        'receiveMove',
+        move
+      )
+    }
+  )
 
   socket.on('disconnect', () => {
-    for (const roomId in rooms) {
-      rooms[roomId] = rooms[
-        roomId
-      ].filter(
-        (player) =>
-          player.id !== socket.id
+    console.log(
+      'Disconnected:',
+      socket.id
+    )
+
+    const roomId = socket.roomId
+
+    if (
+      roomId &&
+      rooms[roomId]
+    ) {
+      rooms[roomId] =
+        rooms[roomId].filter(
+          (player) =>
+            player.id !== socket.id
+        )
+
+      socket
+        .to(roomId)
+        .emit(
+          'opponentDisconnected'
+        )
+
+      io.to(roomId).emit(
+        'players',
+        rooms[roomId]
       )
 
-      if (rooms[roomId].length === 0) {
+      if (
+        rooms[roomId]
+          .length === 0
+      ) {
         delete rooms[roomId]
       }
     }
-
-    console.log('User disconnected')
   })
 })
 

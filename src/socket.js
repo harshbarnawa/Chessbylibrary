@@ -1,5 +1,8 @@
 import { io } from 'socket.io-client'
 
 export const socket = io(
-  'https://chessbylibrary.onrender.com/'
+  'https://chessbylibrary.onrender.com/',
+  {
+    transports: ['websocket'],
+  }
 )
