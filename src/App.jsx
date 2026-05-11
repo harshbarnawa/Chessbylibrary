@@ -51,10 +51,13 @@ const ChessGame = () => {
 
   const { roomId } = useParams()
 
-  const isMultiplayer = !!roomId
+  const isMultiplayer =
+    window.location.pathname.includes(
+      '/room/'
+    )
 
   useEffect(() => {
-    if (!roomId) return
+    if (!isMultiplayer) return
 
     socket.emit('joinRoom', roomId)
 
@@ -74,33 +77,6 @@ const ChessGame = () => {
         setAbortTimer(60)
       }
     })
-
-    socket.on('roomFull', () => {
-      alert('Room is full')
-    })
-
-    socket.on(
-      'opponentDisconnected',
-      () => {
-        setOpponentOffline(true)
-      }
-    )
-
-    return () => {
-      socket.off('playerColor')
-
-      socket.off('players')
-
-      socket.off('roomFull')
-
-      socket.off(
-        'opponentDisconnected'
-      )
-    }
-  }, [roomId])
-
-  useEffect(() => {
-    if (!roomId) return
 
     socket.on(
       'receiveMove',
@@ -124,10 +100,25 @@ const ChessGame = () => {
       }
     )
 
+    socket.on(
+      'opponentDisconnected',
+      () => {
+        setOpponentOffline(true)
+      }
+    )
+
     return () => {
+      socket.off('playerColor')
+
+      socket.off('players')
+
       socket.off('receiveMove')
+
+      socket.off(
+        'opponentDisconnected'
+      )
     }
-  }, [roomId])
+  }, [roomId, isMultiplayer])
 
   useEffect(() => {
     if (
@@ -160,11 +151,13 @@ const ChessGame = () => {
   useEffect(() => {
     if (
       winner ||
-      !gameStarted ||
-      (
-        isMultiplayer &&
-        players.length < 2
-      )
+      !gameStarted
+    )
+      return
+
+    if (
+      isMultiplayer &&
+      players.length < 2
     )
       return
 
@@ -232,8 +225,6 @@ const ChessGame = () => {
     if (!isMultiplayer)
       return true
 
-    if (!piece) return false
-
     return (
       (playerColor === 'white' &&
         piece.color === 'w') ||
@@ -268,7 +259,7 @@ const ChessGame = () => {
 
       setGameStarted(true)
 
-      if (roomId) {
+      if (isMultiplayer) {
         socket.emit('move', {
           roomId,
           move: {
@@ -374,7 +365,7 @@ const ChessGame = () => {
   const renderBoard = () => {
     const board = []
 
-    const normalRanks = [
+    const whiteRanks = [
       '8',
       '7',
       '6',
@@ -385,7 +376,7 @@ const ChessGame = () => {
       '1',
     ]
 
-    const normalFiles = [
+    const whiteFiles = [
       'a',
       'b',
       'c',
@@ -396,7 +387,7 @@ const ChessGame = () => {
       'h',
     ]
 
-    const flippedRanks = [
+    const blackRanks = [
       '1',
       '2',
       '3',
@@ -407,7 +398,7 @@ const ChessGame = () => {
       '8',
     ]
 
-    const flippedFiles = [
+    const blackFiles = [
       'h',
       'g',
       'f',
@@ -420,13 +411,13 @@ const ChessGame = () => {
 
     const ranks =
       playerColor === 'black'
-        ? flippedRanks
-        : normalRanks
+        ? blackRanks
+        : whiteRanks
 
     const files =
       playerColor === 'black'
-        ? flippedFiles
-        : normalFiles
+        ? blackFiles
+        : whiteFiles
 
     ranks.forEach((rank, rIdx) => {
       files.forEach(
@@ -456,23 +447,23 @@ const ChessGame = () => {
                 onSquareClick(square)
               }
               className={`
-                square
-                ${
-                  isDark
-                    ? 'dark'
-                    : 'light'
-                }
-                ${
-                  isSelected
-                    ? 'selected'
-                    : ''
-                }
-                ${
-                  isValidMove
-                    ? 'valid'
-                    : ''
-                }
-              `}
+              square
+              ${
+                isDark
+                  ? 'dark'
+                  : 'light'
+              }
+              ${
+                isSelected
+                  ? 'selected'
+                  : ''
+              }
+              ${
+                isValidMove
+                  ? 'valid'
+                  : ''
+              }
+            `}
             >
               {piece && (
                 <span
@@ -516,7 +507,7 @@ const ChessGame = () => {
             </button>
           </div>
 
-          {!roomId && (
+          {!isMultiplayer && (
             <button
               className="new-game-btn"
               style={{
@@ -632,9 +623,6 @@ const ChessGame = () => {
               ? 'Game Aborted'
               : opponentOffline
               ? 'Opponent Offline'
-              : isMultiplayer &&
-                players.length < 2
-              ? 'Waiting for opponent...'
               : game.turn() ===
                 'w'
               ? "White's Turn"
