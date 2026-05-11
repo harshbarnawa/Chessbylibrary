@@ -1,5 +1,34 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
+:root {
+  --light-square: #edf2e3;
+  --dark-square: #8bb174;
+  --selected: #f6f669;
+  --check: #ff4d4d;
+  --panel: #f4f4f4;
+  --bg: #dfe6dc;
+}
+
+body.theme-classic {
+  --light-square: #edf2e3;
+  --dark-square: #8bb174;
+}
+
+body.theme-blackwhite {
+  --light-square: #f5f5f5;
+  --dark-square: #222;
+}
+
+body.theme-redwhite {
+  --light-square: #fff5f5;
+  --dark-square: #d64545;
+}
+
+body.theme-bluewhite {
+  --light-square: #eef4ff;
+  --dark-square: #4a78d1;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -7,7 +36,7 @@
 }
 
 body {
-  background: #dfe6dc;
+  background: var(--bg);
   font-family: 'Inter', sans-serif;
   overflow-x: hidden;
 }
@@ -30,7 +59,7 @@ body {
 }
 
 .board-wrapper {
-  background: #f4f4f4;
+  background: var(--panel);
   padding: 14px;
   border-radius: 22px;
   box-shadow:
@@ -62,11 +91,38 @@ body {
   border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
-  transition: 0.2s;
 }
 
-.new-game-btn:hover {
-  transform: scale(1.03);
+.theme-selector {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.theme-btn {
+  border: none;
+  padding: 9px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  color: white;
+}
+
+.green-theme {
+  background: #8bb174;
+}
+
+.black-theme {
+  background: #222;
+}
+
+.red-theme {
+  background: #d64545;
+}
+
+.blue-theme {
+  background: #4a78d1;
 }
 
 .board {
@@ -88,15 +144,15 @@ body {
 }
 
 .light {
-  background: #edf2e3;
+  background: var(--light-square);
 }
 
 .dark {
-  background: #8bb174;
+  background: var(--dark-square);
 }
 
 .selected {
-  background: #f6f669 !important;
+  background: var(--selected) !important;
 }
 
 .valid::after {
@@ -109,17 +165,12 @@ body {
 }
 
 .check {
-  background: #ff4d4d !important;
+  background: var(--check) !important;
 }
 
 .piece {
   font-size: 48px;
   user-select: none;
-  transition: 0.15s;
-}
-
-.square:hover .piece {
-  transform: scale(1.06);
 }
 
 .white-piece {
@@ -135,7 +186,7 @@ body {
 
 .sidebar {
   width: 250px;
-  background: #f4f4f4;
+  background: var(--panel);
   border-radius: 20px;
   padding: 16px;
   box-shadow:
@@ -148,7 +199,7 @@ body {
 }
 
 .status-box {
-  background: #edf2e3;
+  background: var(--light-square);
   padding: 14px;
   border-radius: 12px;
   font-size: 16px;
@@ -157,16 +208,11 @@ body {
 }
 
 .moves-box {
-  background: #edf2e3;
+  background: var(--light-square);
   border-radius: 12px;
   padding: 12px;
   max-height: 220px;
   overflow-y: auto;
-}
-
-.moves-box h3 {
-  font-size: 16px;
-  margin-bottom: 8px;
 }
 
 .move {
@@ -175,13 +221,10 @@ body {
   border-bottom: 1px solid rgba(0,0,0,0.08);
 }
 
-/* ================= MOBILE ================= */
-
 @media (max-width: 950px) {
   .chess-container {
     flex-direction: column;
     align-items: center;
-    gap: 14px;
   }
 
   .sidebar {
@@ -191,45 +234,14 @@ body {
 }
 
 @media (max-width: 768px) {
-  body {
-    overflow-y: auto;
-  }
-
-  .chess-app {
-    padding: 6px;
-    align-items: flex-start;
-  }
-
-  .board-wrapper {
-    width: 100%;
-    padding: 10px;
-    border-radius: 16px;
-  }
-
-  .top-bar {
-    flex-direction: column;
-    align-items: stretch;
-    margin-bottom: 10px;
-  }
-
-  .game-title {
-    font-size: 24px;
-    text-align: center;
-  }
-
-  .new-game-btn {
-    width: 100%;
-  }
-
   .board {
     width: 100%;
     grid-template-columns: repeat(8, 1fr);
-    border-width: 4px;
   }
 
   .square {
     width: 100%;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 1/1;
     height: auto;
   }
 
@@ -239,32 +251,10 @@ body {
 
   .sidebar {
     width: 100%;
-    padding: 12px;
-    border-radius: 16px;
   }
 
-  .sidebar h2 {
-    font-size: 20px;
-    margin-bottom: 8px;
-  }
-
-  .status-box {
-    font-size: 14px;
-    padding: 10px;
-    margin-bottom: 10px;
-  }
-
-  .moves-box {
-    padding: 10px;
-    max-height: 140px;
-  }
-
-  .moves-box h3 {
-    font-size: 14px;
-  }
-
-  .move {
-    font-size: 13px;
+  .theme-selector {
+    justify-content: center;
   }
 }
 
@@ -277,30 +267,8 @@ body {
     font-size: 20px;
   }
 
-  .board-wrapper {
-    padding: 7px;
-  }
-
-  .sidebar {
-    padding: 10px;
-  }
-
-  .status-box {
-    font-size: 13px;
-    padding: 8px;
-  }
-
-  .moves-box {
-    max-height: 110px;
-    padding: 8px;
-  }
-
-  .move {
+  .theme-btn {
     font-size: 12px;
-  }
-
-  input {
-    width: 100%;
-    font-size: 12px;
+    padding: 8px 10px;
   }
 }

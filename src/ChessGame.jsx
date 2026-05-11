@@ -52,7 +52,15 @@ const ChessGame = () => {
   const [copied, setCopied] =
     useState(false)
 
+  const [theme, setTheme] =
+    useState('classic')
+
   const { roomId } = useParams()
+
+  useEffect(() => {
+    document.body.className =
+      `theme-${theme}`
+  }, [theme])
 
   useEffect(() => {
     if (roomId) {
@@ -670,6 +678,46 @@ const ChessGame = () => {
             </div>
           )}
 
+          <div className="theme-selector">
+            <button
+              className="theme-btn green-theme"
+              onClick={() =>
+                setTheme('classic')
+              }
+            >
+              Green
+            </button>
+
+            <button
+              className="theme-btn black-theme"
+              onClick={() =>
+                setTheme(
+                  'blackwhite'
+                )
+              }
+            >
+              Black
+            </button>
+
+            <button
+              className="theme-btn red-theme"
+              onClick={() =>
+                setTheme('redwhite')
+              }
+            >
+              Red
+            </button>
+
+            <button
+              className="theme-btn blue-theme"
+              onClick={() =>
+                setTheme('bluewhite')
+              }
+            >
+              Blue
+            </button>
+          </div>
+
           {roomId && (
             <div
               style={{
@@ -707,65 +755,6 @@ const ChessGame = () => {
               )}
             </div>
           </div>
-
-          {opponentOffline &&
-            !gameAborted && (
-              <div
-                style={{
-                  marginBottom: '15px',
-                  background:
-                    '#ff4d4d',
-                  color: 'white',
-                  padding: '12px',
-                  borderRadius:
-                    '10px',
-                  fontWeight:
-                    'bold',
-                  textAlign: 'center',
-                }}
-              >
-                Opponent Offline
-              </div>
-            )}
-
-          {gameAborted && (
-            <div
-              style={{
-                marginBottom: '15px',
-                background: '#111',
-                color: 'white',
-                padding: '12px',
-                borderRadius:
-                  '10px',
-                fontWeight:
-                  'bold',
-                textAlign: 'center',
-              }}
-            >
-              Game Aborted
-            </div>
-          )}
-
-          {winner && (
-            <div
-              style={{
-                marginBottom: '15px',
-                background:
-                  '#ff4d4d',
-                color: 'white',
-                padding: '12px',
-                borderRadius:
-                  '10px',
-                fontWeight:
-                  'bold',
-                textAlign: 'center',
-                fontSize: '20px',
-              }}
-            >
-              {winner} wins on
-              time!
-            </div>
-          )}
 
           <div className="board">
             {renderBoard()}
