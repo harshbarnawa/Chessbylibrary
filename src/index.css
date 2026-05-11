@@ -9,6 +9,7 @@
 body {
   background: #dfe6dc;
   font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
 }
 
 .chess-app {
@@ -16,24 +17,26 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 15px;
 }
 
 .chess-container {
   display: flex;
-  gap: 30px;
+  gap: 25px;
   align-items: flex-start;
-  flex-wrap: wrap;
   justify-content: center;
+  flex-wrap: wrap;
   width: 100%;
 }
 
 .board-wrapper {
   background: #f4f4f4;
-  padding: 20px;
+  padding: 18px;
   border-radius: 24px;
   box-shadow:
-    0 10px 25px rgba(0,0,0,0.08);
+    0 10px 30px rgba(0,0,0,0.08);
+  width: fit-content;
+  max-width: 100%;
 }
 
 .top-bar {
@@ -41,11 +44,12 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 18px;
-  gap: 15px;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .game-title {
-  font-size: 38px;
+  font-size: 34px;
   font-weight: 700;
   color: #111;
 }
@@ -54,7 +58,7 @@ body {
   border: none;
   background: #8bb174;
   color: white;
-  padding: 12px 18px;
+  padding: 11px 18px;
   border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
@@ -62,20 +66,20 @@ body {
 }
 
 .new-game-btn:hover {
-  transform: scale(1.05);
+  transform: scale(1.04);
 }
 
 .board {
   display: grid;
-  grid-template-columns: repeat(8, 82px);
-  border: 8px solid #d6d6d6;
-  border-radius: 14px;
+  grid-template-columns: repeat(8, 78px);
+  border: 8px solid #d7d7d7;
+  border-radius: 16px;
   overflow: hidden;
 }
 
 .square {
-  width: 82px;
-  height: 82px;
+  width: 78px;
+  height: 78px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -110,7 +114,7 @@ body {
 }
 
 .piece {
-  font-size: 58px;
+  font-size: 54px;
   transition: 0.15s;
   user-select: none;
 }
@@ -123,7 +127,7 @@ body {
   color: white;
   text-shadow:
     0 0 2px #000,
-    0 2px 5px rgba(0,0,0,0.4);
+    0 2px 5px rgba(0,0,0,0.45);
 }
 
 .black-piece {
@@ -164,10 +168,9 @@ body {
   border-bottom: 1px solid rgba(0,0,0,0.08);
 }
 
-/* MOBILE RESPONSIVEE  */
+/* ================= MOBILE ================= */
 
-
-@media (max-width: 1100px) {
+@media (max-width: 900px) {
   .chess-container {
     flex-direction: column;
     align-items: center;
@@ -175,32 +178,39 @@ body {
 
   .sidebar {
     width: 100%;
-    max-width: 700px;
+    max-width: 650px;
   }
 }
 
 @media (max-width: 768px) {
   .chess-app {
-    padding: 10px;
+    padding: 8px;
+    align-items: flex-start;
   }
 
   .board-wrapper {
     width: 100%;
     padding: 12px;
+    border-radius: 18px;
   }
 
   .top-bar {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
   }
 
   .game-title {
-    font-size: 28px;
+    font-size: 26px;
+    text-align: center;
+  }
+
+  .new-game-btn {
+    width: 100%;
   }
 
   .board {
-    grid-template-columns: repeat(8, 1fr);
     width: 100%;
+    grid-template-columns: repeat(8, 1fr);
     border-width: 5px;
   }
 
@@ -217,31 +227,49 @@ body {
   .sidebar {
     width: 100%;
     padding: 16px;
+    border-radius: 18px;
   }
 
   .status-box {
-    font-size: 18px;
+    font-size: 17px;
   }
 
   .moves-box {
-    max-height: 250px;
+    max-height: 260px;
   }
 }
 
 @media (max-width: 500px) {
   .piece {
-    font-size: 34px;
+    font-size: 32px;
   }
 
   .game-title {
-    font-size: 24px;
+    font-size: 22px;
   }
 
-  .new-game-btn {
-    width: 100%;
+  .board-wrapper {
+    padding: 8px;
   }
 
-  .top-bar {
+  .sidebar {
+    padding: 12px;
+  }
+
+  .status-box {
+    font-size: 15px;
+    padding: 12px;
+  }
+
+  .moves-box {
+    padding: 10px;
+  }
+
+  .move {
+    font-size: 14px;
+  }
+
+  input {
     width: 100%;
   }
 }
