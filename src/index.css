@@ -4,13 +4,13 @@
   --light:#f0d9b5;
   --dark:#b58863;
 
-  --bg:#ece8df;
-  --panel:#ffffff;
+  --bg:#2f2f34;
+  --panel:#3a3a40;
 
-  --text:#2b2b2b;
+  --text:#f2f2f2;
 
   --selected:rgba(255,214,10,0.35);
-  --valid:rgba(0,0,0,0.18);
+  --valid:rgba(255,255,255,0.22);
 
   --check:#e57373;
 }
@@ -46,6 +46,8 @@ body{
   align-items:flex-start;
 
   padding:18px;
+
+  background:var(--bg);
 }
 
 .chess-container{
@@ -68,7 +70,7 @@ body{
   padding:18px;
 
   box-shadow:
-    0 8px 24px rgba(0,0,0,0.06);
+    0 10px 30px rgba(0,0,0,0.35);
 }
 
 .top-bar{
@@ -96,7 +98,7 @@ body{
   font-size:34px;
   font-weight:700;
 
-  color:#3b3225;
+  color:#f5f5f5;
 }
 
 .top-buttons{
@@ -162,7 +164,9 @@ body{
 
   border:none;
 
-  background:#f7f5f1;
+  background:#4a4a52;
+
+  color:#fff;
 
   padding:12px;
 
@@ -172,7 +176,7 @@ body{
 }
 
 .waiting-box{
-  background:#f6ebcb;
+  background:#4a4a52;
 
   padding:12px;
 
@@ -195,7 +199,7 @@ body{
 
   font-weight:600;
 
-  color:#5f5343;
+  color:#e0e0e0;
 }
 
 .captures-mini{
@@ -216,15 +220,13 @@ body{
   gap:4px;
 }
 
-.capture-item{
-  display:flex;
-  align-items:center;
-
-  gap:2px;
-
+.capture-piece{
   font-size:22px;
 
-  color:#444;
+  line-height:1;
+
+  display:flex;
+  align-items:center;
 }
 
 .board-container{
@@ -327,7 +329,7 @@ body{
   padding:18px;
 
   box-shadow:
-    0 8px 24px rgba(0,0,0,0.06);
+    0 10px 30px rgba(0,0,0,0.35);
 
   height:min(70vw,760px);
 }
@@ -338,11 +340,11 @@ body{
 
   margin-bottom:16px;
 
-  color:#3b3225;
+  color:#f3f3f3;
 }
 
 .status-box{
-  background:#f7f0dc;
+  background:#4a4a52;
 
   padding:14px;
 
@@ -354,7 +356,7 @@ body{
 }
 
 .moves-box{
-  background:#faf6ee;
+  background:#45454d;
 
   border-radius:14px;
 
@@ -369,9 +371,9 @@ body{
   padding:8px 0;
 
   border-bottom:
-    1px solid rgba(0,0,0,0.05);
+    1px solid rgba(255,255,255,0.05);
 
-  color:#5e5446;
+  color:#e5e5e5;
 }
 
 @media(max-width:1100px){
@@ -407,6 +409,8 @@ body{
     border-radius:0;
 
     padding:14px;
+
+    overflow:hidden;
   }
 
   .sidebar{
@@ -421,12 +425,12 @@ body{
     font-size:26px;
   }
 
-.board{
-  width:100vw;
-  height:100vw;
+  .board{
+    width:100vw;
+    height:100vw;
 
-  border-radius:0;
-}
+    border-radius:0;
+  }
 
   .game-info{
     font-size:13px;
@@ -435,21 +439,10 @@ body{
   .room-box{
     flex-direction:column;
   }
-  .board-wrapper{
-  overflow:hidden;
-}
 
-.board-container{
-  width:100vw;
+  .board-container{
+    width:100vw;
 
-  margin-left:-14px;
-}
-}
-.capture-piece{
-  font-size:22px;
-
-  line-height:1;
-
-  display:flex;
-  align-items:center;
+    margin-left:-14px;
+  }
 }
