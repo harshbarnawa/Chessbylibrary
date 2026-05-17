@@ -113,7 +113,9 @@ const ChessGame = () => {
           gameCopy.move(move)
 
           setMoveHistory(
-            gameCopy.history()
+            gameCopy.history({
+              verbose: true,
+            })
           )
 
           return gameCopy
@@ -263,7 +265,9 @@ const ChessGame = () => {
       setGame(gameCopy)
 
       setMoveHistory(
-        gameCopy.history()
+        gameCopy.history({
+          verbose: true,
+        })
       )
 
       setGameStarted(true)
@@ -329,28 +333,6 @@ const ChessGame = () => {
     setSelectedSquare(null)
   }
 
-  const resetGame = () => {
-    setGame(new Chess())
-
-    setSelectedSquare(null)
-
-    setMoveHistory([])
-
-    setWhiteTime(600)
-
-    setBlackTime(600)
-
-    setWinner(null)
-
-    setGameStarted(false)
-
-    setOpponentOffline(false)
-
-    setAbortTimer(60)
-
-    setGameAborted(false)
-  }
-
   const pieceSymbols = {
     w: {
       k: '♔',
@@ -369,6 +351,27 @@ const ChessGame = () => {
       n: '♞',
       p: '♟',
     },
+  }
+
+  const getCapturedPieces = (
+    color
+  ) => {
+    return moveHistory
+      .filter(
+        (move) =>
+          move.captured
+      )
+      .map((move) => {
+        const capturedColor =
+          color === 'white'
+            ? 'b'
+            : 'w'
+
+        return pieceSymbols[
+          capturedColor
+        ][move.captured]
+      })
+      .join(' ')
   }
 
   const renderBoard = () => {
@@ -463,28 +466,28 @@ const ChessGame = () => {
                 onSquareClick(square)
               }
               className={`
-              square
-              ${
-                isDark
-                  ? 'dark'
-                  : 'light'
-              }
-              ${
-                isSelected
-                  ? 'selected'
-                  : ''
-              }
-              ${
-                isValidMove
-                  ? 'valid'
-                  : ''
-              }
-              ${
-                kingInCheck
-                  ? 'check'
-                  : ''
-              }
-            `}
+                square
+                ${
+                  isDark
+                    ? 'dark'
+                    : 'light'
+                }
+                ${
+                  isSelected
+                    ? 'selected'
+                    : ''
+                }
+                ${
+                  isValidMove
+                    ? 'valid'
+                    : ''
+                }
+                ${
+                  kingInCheck
+                    ? 'check'
+                    : ''
+                }
+              `}
             >
               {piece && (
                 <span
@@ -553,10 +556,15 @@ const ChessGame = () => {
 
   return (
     <div className="chess-app">
+
       <div className="chess-container">
+
         <div className="board-wrapper">
+
           <div className="top-bar">
+
             <div className="logo-section">
+
               <img
                 src="/bee-logo.png"
                 alt="Chess Bee"
@@ -566,70 +574,62 @@ const ChessGame = () => {
               <h1 className="game-title">
                 Chess Bee
               </h1>
+
             </div>
 
-            <button
-              className="new-game-btn"
-              onClick={resetGame}
-            >
-              New Game
-            </button>
+            <div className="top-buttons">
+
+              {!roomId && (
+                <button
+                  className="main-btn"
+                  onClick={() => {
+                    const id =
+                      crypto.randomUUID()
+
+                    window.location.href =
+                      `/room/${id}`
+                  }}
+                >
+                  Create Room
+                </button>
+              )}
+
+              {roomId && (
+                <button
+                  className="leave-btn"
+                  onClick={() => {
+                    window.location.href =
+                      '/'
+                  }}
+                >
+                  <img
+                    src="/leave.svg"
+                    alt="Leave"
+                    className="leave-icon"
+                  />
+                </button>
+              )}
+
+            </div>
+
           </div>
 
-          {!roomId ? (
-            <button
-              className="new-game-btn"
-              style={{
-                marginBottom: '18px',
-              }}
-              onClick={() => {
-                const id =
-                  crypto.randomUUID()
+          {roomId && (
+            <>
+              <div className="room-box">
 
-                window.location.href = `/room/${id}`
-              }}
-            >
-              Create Room
-            </button>
-          ) : (
-            <div
-              style={{
-                marginBottom: '18px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '12px',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  gap: '10px',
-                  flexWrap: 'wrap',
-                }}
-              >
                 <input
                   value={
                     window.location.href
                   }
                   readOnly
-                  style={{
-                    padding: '12px',
-                    borderRadius:
-                      '12px',
-                    border:
-                      '1px solid rgba(255,255,255,0.08)',
-                    flex: 1,
-                    minWidth: '220px',
-                    outline: 'none',
-                  }}
                 />
 
                 <button
-                  className="new-game-btn"
+                  className="copy-btn"
                   onClick={() => {
                     navigator.clipboard.writeText(
-                      window.location
-                        .href
+                      window.location.href
                     )
 
                     setCopied(true)
@@ -641,30 +641,15 @@ const ChessGame = () => {
                 >
                   {copied
                     ? 'Copied'
-                    : 'Copy Link'}
+                    : 'Copy'}
                 </button>
+
               </div>
 
               {players.length < 2 &&
                 !gameAborted && (
-                  <div
-                    style={{
-                      background:
-                        'rgba(255,255,255,0.05)',
-                      padding: '12px',
-                      borderRadius:
-                        '12px',
-                      fontWeight:
-                        '600',
-                      display: 'flex',
-                      justifyContent:
-                        'space-between',
-                      alignItems:
-                        'center',
-                      gap: '10px',
-                      flexWrap: 'wrap',
-                    }}
-                  >
+                  <div className="waiting-box">
+
                     <span>
                       Waiting for
                       opponent...
@@ -673,36 +658,14 @@ const ChessGame = () => {
                     <span>
                       {abortTimer}s
                     </span>
+
                   </div>
                 )}
-            </div>
+            </>
           )}
 
-          {roomId && (
-            <div
-              style={{
-                marginBottom: '18px',
-                fontWeight: '600',
-                fontSize: '16px',
-                color: '#d1d5db',
-              }}
-            >
-              Playing as:{' '}
-              {playerColor || '...'}
-            </div>
-          )}
+          <div className="game-info">
 
-          <div
-            style={{
-              display: 'flex',
-              justifyContent:
-                'space-between',
-              marginBottom: '18px',
-              fontWeight: '600',
-              fontSize: '18px',
-              color: '#f3f4f6',
-            }}
-          >
             <div>
               White ⏱{' '}
               {formatTime(
@@ -711,47 +674,94 @@ const ChessGame = () => {
             </div>
 
             <div>
+              {getStatus()}
+            </div>
+
+            <div>
               Black ⏱{' '}
               {formatTime(
                 blackTime
               )}
             </div>
+
           </div>
 
-          <div className="board">
-            {renderBoard()}
-          </div>
+  <div className="captured-row">
+
+  <div className="capture-box">
+
+    <div className="capture-title">
+      White Captures
+    </div>
+
+    <div className="capture-pieces">
+      {getCapturedPieces('white')}
+    </div>
+
+  </div>
+
+  <div className="capture-box">
+
+    <div className="capture-title">
+      Black Captures
+    </div>
+
+    <div className="capture-pieces">
+      {getCapturedPieces('black')}
+    </div>
+
+  </div>
+
+</div>
+
+          <div className="board-container">
+  <div className="board">
+    {renderBoard()}
+  </div>
+</div>
+
         </div>
 
         <div className="sidebar">
-          <h2>Game Status</h2>
+
+          <div className="sidebar-title">
+            Game Status
+          </div>
 
           <div className="status-box">
             {getStatus()}
           </div>
 
           <div className="moves-box">
-            <h3>Moves</h3>
 
             {moveHistory.length ===
             0 ? (
-              <p>No moves yet</p>
+              <p>
+                No moves yet
+              </p>
             ) : (
               moveHistory.map(
-                (move, index) => (
+                (
+                  move,
+                  index
+                ) => (
                   <div
                     key={index}
                     className="move"
                   >
                     {index + 1}.{' '}
-                    {move}
+                    {move.san}
                   </div>
                 )
               )
             )}
+
           </div>
+
         </div>
+
       </div>
+
     </div>
   )
 }
