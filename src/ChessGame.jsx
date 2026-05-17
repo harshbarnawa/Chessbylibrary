@@ -52,15 +52,7 @@ const ChessGame = () => {
   const [copied, setCopied] =
     useState(false)
 
-  const [theme, setTheme] =
-    useState('classic')
-
   const { roomId } = useParams()
-
-  useEffect(() => {
-    document.body.className =
-      `theme-${theme}`
-  }, [theme])
 
   useEffect(() => {
     if (roomId) {
@@ -564,9 +556,17 @@ const ChessGame = () => {
       <div className="chess-container">
         <div className="board-wrapper">
           <div className="top-bar">
-            <h1 className="game-title">
-              ♟ Chess Arena
-            </h1>
+            <div className="logo-section">
+              <img
+                src="/bee-logo.png"
+                alt="Chess Bee"
+                className="logo-img"
+              />
+
+              <h1 className="game-title">
+                Chess Bee
+              </h1>
+            </div>
 
             <button
               className="new-game-btn"
@@ -580,7 +580,7 @@ const ChessGame = () => {
             <button
               className="new-game-btn"
               style={{
-                marginBottom: '15px',
+                marginBottom: '18px',
               }}
               onClick={() => {
                 const id =
@@ -589,12 +589,12 @@ const ChessGame = () => {
                 window.location.href = `/room/${id}`
               }}
             >
-              Create Multiplayer Room
+              Create Room
             </button>
           ) : (
             <div
               style={{
-                marginBottom: '15px',
+                marginBottom: '18px',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '12px',
@@ -613,13 +613,14 @@ const ChessGame = () => {
                   }
                   readOnly
                   style={{
-                    padding: '10px',
+                    padding: '12px',
                     borderRadius:
-                      '10px',
+                      '12px',
                     border:
-                      '1px solid #ccc',
+                      '1px solid rgba(255,255,255,0.08)',
                     flex: 1,
                     minWidth: '220px',
+                    outline: 'none',
                   }}
                 />
 
@@ -639,8 +640,8 @@ const ChessGame = () => {
                   }}
                 >
                   {copied
-                    ? 'Copied!'
-                    : 'Share Link'}
+                    ? 'Copied'
+                    : 'Copy Link'}
                 </button>
               </div>
 
@@ -649,12 +650,12 @@ const ChessGame = () => {
                   <div
                     style={{
                       background:
-                        '#ffcc00',
+                        'rgba(255,255,255,0.05)',
                       padding: '12px',
                       borderRadius:
-                        '10px',
+                        '12px',
                       fontWeight:
-                        'bold',
+                        '600',
                       display: 'flex',
                       justifyContent:
                         'space-between',
@@ -670,7 +671,6 @@ const ChessGame = () => {
                     </span>
 
                     <span>
-                      Auto Abort in:{' '}
                       {abortTimer}s
                     </span>
                   </div>
@@ -678,55 +678,16 @@ const ChessGame = () => {
             </div>
           )}
 
-          <div className="theme-selector">
-            <button
-              className="theme-btn green-theme"
-              onClick={() =>
-                setTheme('classic')
-              }
-            >
-              Green
-            </button>
-
-            <button
-              className="theme-btn black-theme"
-              onClick={() =>
-                setTheme(
-                  'blackwhite'
-                )
-              }
-            >
-              Black
-            </button>
-
-            <button
-              className="theme-btn red-theme"
-              onClick={() =>
-                setTheme('redwhite')
-              }
-            >
-              Red
-            </button>
-
-            <button
-              className="theme-btn blue-theme"
-              onClick={() =>
-                setTheme('bluewhite')
-              }
-            >
-              Blue
-            </button>
-          </div>
-
           {roomId && (
             <div
               style={{
-                marginBottom: '15px',
-                fontWeight: 'bold',
-                fontSize: '18px',
+                marginBottom: '18px',
+                fontWeight: '600',
+                fontSize: '16px',
+                color: '#d1d5db',
               }}
             >
-              You are playing as:{' '}
+              Playing as:{' '}
               {playerColor || '...'}
             </div>
           )}
@@ -736,9 +697,10 @@ const ChessGame = () => {
               display: 'flex',
               justifyContent:
                 'space-between',
-              marginBottom: '15px',
-              fontWeight: 'bold',
-              fontSize: '20px',
+              marginBottom: '18px',
+              fontWeight: '600',
+              fontSize: '18px',
+              color: '#f3f4f6',
             }}
           >
             <div>
@@ -769,7 +731,7 @@ const ChessGame = () => {
           </div>
 
           <div className="moves-box">
-            <h3>Move History</h3>
+            <h3>Moves</h3>
 
             {moveHistory.length ===
             0 ? (
